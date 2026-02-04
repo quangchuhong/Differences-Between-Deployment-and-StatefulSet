@@ -43,13 +43,15 @@ Tài liệu này tóm tắt sự khác nhau giữa **Deployment** và **Stateful
 ---
 
 ### 3. Khi nào dùng cái nào?
-Dùng Deployment khi:
 
-App không cần lưu state trên local pod.
-Dữ liệu chính nằm ở DB/Redis/S3 bên ngoài.
-Cần scale ngang linh hoạt, autoscale theo HPA.
-Dùng StatefulSet khi:
+- Dùng Deployment khi:
 
-Mỗi instance cần danh tính riêng + volume riêng.
-App là DB/queue/cluster cần ổn định node ID.
-Cần đảm bảo restart/scaling không làm “lạc” dữ liệu gắn với từng pod.
+  - App không cần lưu state trên local pod.
+  - Dữ liệu chính nằm ở DB/Redis/S3 bên ngoài.
+  - Cần scale ngang linh hoạt, autoscale theo HPA.
+    
+- Dùng StatefulSet khi:
+
+  - Mỗi instance cần danh tính riêng + volume riêng.
+  - App là DB/queue/cluster cần ổn định node ID.
+  - Cần đảm bảo restart/scaling không làm “lạc” dữ liệu gắn với từng pod.
