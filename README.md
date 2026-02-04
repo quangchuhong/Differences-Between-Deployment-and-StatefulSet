@@ -137,7 +137,8 @@ Ngược lại, stateless app là API/web/worker chỉ xử lý request và lưu
   - Stateful đúng chuẩn: mất pod không sao, miễn PVC còn → pod mới gắn lại PVC cũ.
   - Mất luôn PVC/volume: mất state của instance đó → phải khôi phục từ replica/backup.
 
-Ví dụ: 
+Ví dụ:
+
 **Với stateful app chuẩn trên Kubernetes (StatefulSet + PVC riêng)**
 
 pod db-0 gắn với PVC data-db-0.
