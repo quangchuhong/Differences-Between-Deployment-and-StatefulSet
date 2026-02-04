@@ -23,7 +23,7 @@ Tài liệu này tóm tắt sự khác nhau giữa **Deployment** và **Stateful
   - Database (MySQL, PostgreSQL, MongoDB…)
   - Kafka, Zookeeper, Redis cluster…
  
-### Dùng cho stateless app.
+### stateless app.
 
 - Pod không có danh tính cố định (pod-abc, pod-def… xoá là tạo pod mới tên khác).
 - Không đảm bảo thứ tự start/stop pod.
@@ -31,6 +31,30 @@ Tài liệu này tóm tắt sự khác nhau giữa **Deployment** và **Stateful
 - Thường kết hợp với:
   - Service kiểu ClusterIP/LoadBalancer
   - PVC dùng chung cho nhiều pod chỉ khi app tự xử lý được (ít gặp).
+    
+**Đặc điểm chính**: 
+
+- Không lưu state quan trọng trên local disk của pod/container:
+  - Log, cache tạm thì được; dữ liệu lâu dài thì không.
+- Không phụ thuộc session trong memory của pod:
+  - Session nên lưu ở Redis, DB, JWT… thay vì chỉ trong RAM của 1 instance.
+- Dễ scale ngang:
+  - Tăng từ 2 → 10 replica chỉ là thêm nhiều pod giống hệt, không cần setup gì đặc biệt.
+
+### stateful app (có dữ liệu, cần stable identity).
+
+- Mỗi pod có tên cố định theo index:
+  - app-0, app-1, app-2…
+- Mỗi replica gắn với PVC riêng:
+  - data-app-0, data-app-1…
+- Khi restart/scaling:
+  - Pod app-0 luôn gắn với đúng PVC data-app-0.
+- Hỗ trợ:
+  - Thứ tự start: từ 0 → n-1
+  - Thứ tự stop: ngược lại
+- Dùng cho:
+  - Database (MySQL, PostgreSQL, MongoDB…)
+  - Kafka, Zookeeper, Redis cluster…
 
 ---
 
