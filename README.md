@@ -40,6 +40,13 @@ Tài liệu này tóm tắt sự khác nhau giữa **Deployment** và **Stateful
   - Session nên lưu ở Redis, DB, JWT… thay vì chỉ trong RAM của 1 instance.
 - Dễ scale ngang:
   - Tăng từ 2 → 10 replica chỉ là thêm nhiều pod giống hệt, không cần setup gì đặc biệt.
+ 
+**Ví dụ stateless app**
+
+- Web API, backend REST/GraphQL:
+  - Xử lý request, đọc/ghi dữ liệu qua DB/PostgreSQL/MySQL, trả response.
+- Frontend (React/Vue/Angular) serve file tĩnh.
+- Worker xử lý hàng đợi (nếu mỗi job tự chứa đủ thông tin và kết quả ghi về DB/S3,…).
 
 ### stateful app (có dữ liệu, cần stable identity).
 
@@ -55,6 +62,43 @@ Tài liệu này tóm tắt sự khác nhau giữa **Deployment** và **Stateful
 - Dùng cho:
   - Database (MySQL, PostgreSQL, MongoDB…)
   - Kafka, Zookeeper, Redis cluster…
+
+**Đặc điểm chính**: 
+
+1. Có dữ liệu gắn với từng instance
+
+- Mỗi instance (node/pod) có dữ liệu riêng trên disk:
+  - DB files (MySQL, PostgreSQL, MongoDB…)
+  - Log, queue segments (Kafka)
+  - Metadata, snapshot, index (Elasticsearch…)
+- Dữ liệu này không thể mất khi pod chết.
+  
+2. Cần identity (danh tính) cố định
+
+- Các instance được phân vai: node-0, node-1, node-2…
+- Cluster/clients biết rõ “node nào là ai”.
+- Khi restart, node-0 phải quay lại đúng volume của node-0.
+  
+3. Không thể scale ngang “vô tội vạ” như stateless
+
+- Thêm 1 replica = thêm 1 node vào cluster → cần:
+  - Cấu hình join/leave,
+  - Rebalance data,
+  - Thường cần operator hoặc manual.
+    
+4. Cần storage persistent
+
+  - Dùng PVC, PV (EBS, local SSD, …) gắn cố định với từng pod.
+  - Thường triển khai bằng StatefulSet trong Kubernetes.
+    
+Ví dụ điển hình stateful app:
+
+- MySQL/PostgreSQL/MongoDB
+- Redis (khi dùng persistence, cluster/sentinel)
+- Kafka, ZooKeeper
+- Elasticsearch, Cassandra, etcd
+- 
+Ngược lại, stateless app là API/web/worker chỉ xử lý request và lưu state ở nơi khác (DB, Redis, S3…), pod chết hay tạo mới đều không ảnh hưởng state.
 
 ---
 
