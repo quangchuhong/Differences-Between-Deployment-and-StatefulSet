@@ -65,7 +65,7 @@ Tài liệu này tóm tắt sự khác nhau giữa **Deployment** và **Stateful
 
 **Đặc điểm chính**: 
 
-1. Có dữ liệu gắn với từng instance
+**1. Có dữ liệu gắn với từng instance**
 
 - Mỗi instance (node/pod) có dữ liệu riêng trên disk:
   - DB files (MySQL, PostgreSQL, MongoDB…)
@@ -73,31 +73,31 @@ Tài liệu này tóm tắt sự khác nhau giữa **Deployment** và **Stateful
   - Metadata, snapshot, index (Elasticsearch…)
 - Dữ liệu này không thể mất khi pod chết.
   
-2. Cần identity (danh tính) cố định
+**2. Cần identity (danh tính) cố định**
 
 - Các instance được phân vai: node-0, node-1, node-2…
 - Cluster/clients biết rõ “node nào là ai”.
 - Khi restart, node-0 phải quay lại đúng volume của node-0.
   
-3. Không thể scale ngang “vô tội vạ” như stateless
+**3. Không thể scale ngang “vô tội vạ” như stateless**
 
 - Thêm 1 replica = thêm 1 node vào cluster → cần:
   - Cấu hình join/leave,
   - Rebalance data,
   - Thường cần operator hoặc manual.
     
-4. Cần storage persistent
+**4. Cần storage persistent**
 
   - Dùng PVC, PV (EBS, local SSD, …) gắn cố định với từng pod.
   - Thường triển khai bằng StatefulSet trong Kubernetes.
     
-Ví dụ điển hình stateful app:
+**Ví dụ điển hình stateful app:**
 
 - MySQL/PostgreSQL/MongoDB
 - Redis (khi dùng persistence, cluster/sentinel)
 - Kafka, ZooKeeper
 - Elasticsearch, Cassandra, etcd
-- 
+  
 Ngược lại, stateless app là API/web/worker chỉ xử lý request và lưu state ở nơi khác (DB, Redis, S3…), pod chết hay tạo mới đều không ảnh hưởng state.
 
 ---
