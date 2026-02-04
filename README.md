@@ -132,3 +132,25 @@ Ngược lại, stateless app là API/web/worker chỉ xử lý request và lưu
   - Mỗi instance cần danh tính riêng + volume riêng.
   - App là DB/queue/cluster cần ổn định node ID.
   - Cần đảm bảo restart/scaling không làm “lạc” dữ liệu gắn với từng pod.
+ 
+**Lưu ý:**
+  - Stateful đúng chuẩn: mất pod không sao, miễn PVC còn → pod mới gắn lại PVC cũ.
+  - Mất luôn PVC/volume: mất state của instance đó → phải khôi phục từ replica/backup.
+
+Ví dụ: 
+**Với stateful app chuẩn trên Kubernetes (StatefulSet + PVC riêng)**
+
+pod db-0 gắn với PVC data-db-0.
+
+- Nếu chỉ pod bị xoá (PVC vẫn còn):
+
+  - K8s/StatefulSet sẽ tạo lại db-0 mới.
+  - Pod mới mount lại đúng PVC data-db-0 → dữ liệu vẫn còn, app chạy lại được.
+  - Đây là trường hợp “healthy” mong muốn.
+    
+- Nếu pod + PVC bị xoá (hoặc PV bị mất):
+
+  - Toàn bộ state gắn với instance đó mất hẳn.
+  - Với DB/cluster, có thể:
+    - Mất shard/replica,
+    - Cần rebuild từ bản sao khác hoặc từ backup.
